@@ -1,4 +1,5 @@
 import * as React from 'react';
+import axios from 'axios'
 import { LinearGradient } from 'expo-linear-gradient';
 import {
     View,
@@ -18,9 +19,58 @@ import {
 import {
     PrimaryButton
 } from '../../Componets'
-
+import { setId, setEmail, setNama } from '../../reducer/UserReducer'
+import { useDispatch } from 'react-redux'
 
 export default LoginScreen =  ({navigation}) => {
+    const [email, onChangeEmail] = React.useState(null);
+    const [password, onChangePassword] = React.useState(null);
+    const [IsLoading, onChangeLoading] = React.useState(false);
+    const [isError, onError] = React.useState(false);
+    const [message, onSetMessage] = React.useState(null);
+    const dispatch = useDispatch()
+
+    const onCheckLogin =()=>{
+        onChangeLoading(true)
+        onError(false)
+        axios.post('https://data.mongodb-api.com/app/data-yvczw/endpoint/data/v1/action/findOne',{
+            "dataSource": "Cluster0",
+            "database": "app_taskita",
+            "collection": "member",
+            "filter": { "email": email, "password":password}
+        },{
+            headers:{
+                'api-key': 'zYwAQaYVJ2hdF6WVlhy4gFM7i6IOGAcAJ5lips8IYEjIkXjoksjPpuTBZvGjt4uC'
+            }
+        }).then(res=>{
+            if(res.data.document != null ){
+                onError(false)
+                dispatch(setId(res.data.document._id))
+                dispatch(setNama(res.data.document.name))
+                dispatch(setEmail(res.data.document.email))
+
+                navigation.replace('MainScreen')
+            }else{
+                onSetMessage('invalid username and password')
+                onError(true)
+            }
+        }).catch(err=>{
+            onError(true)
+            onSetMessage(err.message)
+            console.log(err)
+            
+        }).finally(()=>{
+            onChangeLoading(false)
+        })
+    }
+
+    const ErrorMessage=()=>{
+        if(isError){
+            return <Text style={{color:'red', marginTop:10, textAlign:'center'}}>{message}</Text>
+        }else{
+            return null
+        }
+    }
 
     return (
         <SafeAreaView style={{ flex:1 }}>
@@ -35,12 +85,26 @@ export default LoginScreen =  ({navigation}) => {
                 <Text style={styles.HeaderText}>Login</Text>
                 <Text style={styles.BodyText}>Please login to your account</Text>
                 <TextInput 
-                    style={[styles.inputStyle, {marginTop:80}]} 
+                    style={[styles.inputStyle, {marginTop:20}]} 
                     placeholder="Email"
+                    value={email}
+                    onChangeText={onChangeEmail}
                 />
-                <TextInput style={styles.inputStyle} placeholder="Password"/>
 
-                <PrimaryButton customeStyle={styles.btnLoginStyle} title="LOGIN"/>
+                <TextInput 
+                    style={styles.inputStyle} 
+                    placeholder="Password"
+                    secureTextEntry
+                    value={password}
+                    onChangeText={onChangePassword}/>
+
+                <PrimaryButton 
+                    isLoading={IsLoading}  
+                    customeStyle={styles.btnLoginStyle} 
+                    onPress={()=>onCheckLogin()}
+                    title="LOGIN"/>
+
+                <ErrorMessage/>
 
                 <Text style={styles.smallText}>Forgot Password ?</Text>
                 <Text style={styles.smallTextCenter}>Or login with</Text>
@@ -86,7 +150,7 @@ const styles = StyleSheet.create({
     },
     inputStyle:{
         height: 50,
-        marginTop: 12,
+        marginTop: 8,
         borderWidth: 1,
         paddingLeft:30,
         borderRadius:50,
@@ -109,7 +173,7 @@ const styles = StyleSheet.create({
     smallTextCenter:{
         fontFamily:'Roboto-Light',
         fontSize:14,
-        marginTop:50,
+        marginTop:30,
         color:'white',
         textAlign:'center'
     },
@@ -123,7 +187,7 @@ const styles = StyleSheet.create({
     footherText:{
         flexDirection:'row',
         justifyContent:'center',
-        marginTop:50
+        marginTop:20
     },
     smallFootherText:{
         fontFamily:'Roboto-Light',
@@ -140,6 +204,6 @@ const styles = StyleSheet.create({
     footherTextTwo:{
         flexDirection:'row',
         justifyContent:'center',
-        marginTop:20
+        marginTop:5
     }
 });

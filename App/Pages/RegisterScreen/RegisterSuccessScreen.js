@@ -15,7 +15,7 @@ import {
     SuccessButton
 } from '../../Componets'
 
-export default RegisterSuccessScreen = () =>{
+export default RegisterSuccessScreen = ({navigation}) =>{
     return(
         <SafeAreaView style={{flex:1}}>
             <LinearGradient 
@@ -34,7 +34,7 @@ export default RegisterSuccessScreen = () =>{
                     <Text style={[styles.textBody,{marginTop:20}]}>Click login button to continue, please</Text>
                     <Text style={styles.textBody}>enjouy your app</Text>
                 </View>
-                <SuccessButton title='Continue Login' customeStyle={styles.btnSuccess}/>
+                <SuccessButton onPress={()=>navigation.navigate('LoginScreen')} title='Continue Login' customeStyle={styles.btnSuccess}/>
 
             </LinearGradient>
         </SafeAreaView>

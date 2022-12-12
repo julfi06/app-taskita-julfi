@@ -1,11 +1,19 @@
 import * as React from 'react';
 import {View, Text, SafeAreaView, StyleSheet, Image, StatusBar} from 'react-native';
 import {IconSplash} from '../../assets';
+import { useSelector } from 'react-redux'
 
 export default SplashScreen = ({navigation}) => {
+  const id = useSelector((state) => state.user.id)
+
   React.useEffect(() => {
     setTimeout(() => {
-      navigation.replace('LoginScreen')
+      console.log('id',id)
+      if(id !=""){
+        navigation.replace('MainScreen')
+      }else{
+        navigation.replace('LoginScreen')
+      }
      }, 3000)
     }, [navigation]);
 

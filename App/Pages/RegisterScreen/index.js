@@ -19,7 +19,9 @@ export default RegisterScreen = ({navigation})=>{
     const [name, onChangeName] = React.useState(null);
     const [email, onChangeEmail] = React.useState(null);
     const [password, onChangePassword] = React.useState(null);
+    const [isLoading, onChangeLoading] = React.useState(false);
     const onRegister=()=>{
+        onChangeLoading(true)
         axios.post('https://data.mongodb-api.com/app/data-yvczw/endpoint/data/v1/action/insertOne',{
             "dataSource": "Cluster0",
             "database": "app_taskita",
@@ -38,6 +40,8 @@ export default RegisterScreen = ({navigation})=>{
         }).catch(err=>{
             console.log(err)
             navigation.navigate('RegisterErrorScreen')
+        }).finally(()=>{
+            onChangeLoading(false)
         })
     }
 
@@ -70,12 +74,14 @@ export default RegisterScreen = ({navigation})=>{
                 <TextInput 
                     style={[styles.inputStyle]} 
                     placeholder="Password"
+                    secureTextEntry
                     onChangeText={onChangePassword}
                     value={password}/>
                 
                 <PrimaryButton 
                     customeStyle={styles.btnRegisterStyle} 
                     title="REGISTER"
+                    isLoading={isLoading}
                     onPress={()=>onRegister()}/>
 
                 <View style={styles.footherText}>
